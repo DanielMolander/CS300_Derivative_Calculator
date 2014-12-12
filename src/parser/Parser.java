@@ -23,6 +23,11 @@ public abstract class Parser {
 			eq = eq.substring(1);
 			if(token.equals("+")){
 				addNode.addChild(multiply());
+			}else if(token.equals("-")){
+				MultiplicationNode multNode = new MultiplicationNode();
+				multNode.addChild(new ConstantNode("-1"));
+				multNode.addChild(multiply());
+				addNode.addChild(multNode);
 			}
 			token = getToken(1);
 		}
@@ -41,6 +46,12 @@ public abstract class Parser {
 			eq = eq.substring(1);
 			if(token.equals("*")){
 				multNode.addChild(power());
+			}else if(token.equals("/")){
+				//this is a work around to avoid complicating code by adding division nodes
+				PowerNode powerNode = new PowerNode();
+				powerNode.addChild(power());
+				powerNode.addChild(new ConstantNode("-1"));
+				multNode.addChild(powerNode);
 			}
 			token = getToken(1);
 		}
@@ -152,8 +163,8 @@ public abstract class Parser {
 		MultiplicationNode multNode = new MultiplicationNode();
 		ConstantNode coefficient = null;
 //		System.out.println("result: "+result);
+		coefficient = new ConstantNode(""+result);
 		if(!result.equals(new BigInteger(""+1)) && !result.equals(new BigInteger(""+0))){
-			coefficient = new ConstantNode(""+result);
 			multNode.addChild(coefficient);
 		}
 		s=getToken(1);
@@ -175,6 +186,7 @@ public abstract class Parser {
 			return multNode;
 		if(varNode != null)
 			return varNode;
+
 		return coefficient;
 	}
 	

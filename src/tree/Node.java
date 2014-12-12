@@ -8,11 +8,15 @@ import java.util.ArrayList;
  */
 public abstract class Node {
 	
-	private String display;
+//	private String display;
 	protected ArrayList<Node> children;
 	
 	public Node(String display){
-		this.display = display;
+//		this.display = display;
+	}
+	
+	public Node(){
+		
 	}
 	
 	public void addChild(Node node){

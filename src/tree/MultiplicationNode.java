@@ -19,19 +19,21 @@ public class MultiplicationNode extends Node{
 		Node simplifiedNode = simplify();
 		if(!(simplifiedNode instanceof MultiplicationNode))
 			return simplifiedNode.Differentiate(var);
-		if(simplifiedNode.getNumChildren() == 0){
-			return simplifiedNode.Differentiate(var);
-		}
-		if(simplifiedNode.getNumChildren() == 1){
-			return simplifiedNode.getChild(0).Differentiate(var);
-		}
+		//these 2 cases are unnecessary
+//		if(simplifiedNode.getNumChildren() == 0){
+//			return simplifiedNode.Differentiate(var);
+//		}
+//		if(simplifiedNode.getNumChildren() == 1){
+//			return simplifiedNode.getChild(0).Differentiate(var);
+//		}
+		Node leftNode = simplifiedNode.children.get(0);
 		simplifiedNode.children.remove(0);
 		AdditionNode addNode = new AdditionNode();
 		MultiplicationNode left = new MultiplicationNode();
 		MultiplicationNode right = new MultiplicationNode();
-		left.addChild(children.get(0).clone());
+		left.addChild(leftNode.clone());
 		left.addChild(simplifiedNode.Differentiate(var));
-		right.addChild(children.get(0).Differentiate(var));
+		right.addChild(leftNode.Differentiate(var));
 		right.addChild(simplifiedNode);
 		addNode.addChild(left);
 		addNode.addChild(right);
@@ -41,32 +43,43 @@ public class MultiplicationNode extends Node{
 	//NEEDS WORK
 	public Node simplify() {
 		if(getNumChildren() == 1)
-			return children.get(0);
+			return children.get(0).clone();
 		BigInteger num = new BigInteger("1");
 		MultiplicationNode multNode = new MultiplicationNode();
 		for(Node n : children){
 			if(n instanceof ConstantNode){
 				ConstantNode leaf = (ConstantNode) n;
-				if(leaf.getVal().equals(new BigInteger(""+0)))
+				if(leaf.getVal().equals(BigInteger.ZERO))
 					return new ConstantNode("0");
 				num=num.multiply(leaf.getVal());
-			}
-			else{
+			}else if(n instanceof MultiplicationNode){
+				Node temp = n.clone();
+				for(int i = 0; i < n.getNumChildren(); i++){
+					Node c = temp.getChild(0);
+					multNode.addChild(c.simplify());
+					temp.children.remove(0);
+				}
+			}else{
 				multNode.addChild(n.simplify());
 			}
 		}
 		if(multNode.getNumChildren() == 0){
 			return new ConstantNode(""+num);
 		}
-		if(multNode.getNumChildren() == 1 && num.equals(BigInteger.ONE)){
-				return multNode.getChild(0);
+		if(!num.equals(BigInteger.ONE)){
+			ConstantNode n = new ConstantNode(""+num);
+//			System.out.println("N: "+n);
+			multNode.addChild(n, 0);
 		}
-		if(!num.equals(BigInteger.ONE))
-			multNode.addChild(new ConstantNode(""+num), 0);
+		if(multNode.getNumChildren() == 1){
+				return multNode.getChild(0).clone();
+		}
 		return multNode;
 	}
 
 	public String toString(){
+		if(getNumChildren() == 0)
+			return "";
 		String result = "(";
 //		if(children == null)
 //			return "( m had no kids )";

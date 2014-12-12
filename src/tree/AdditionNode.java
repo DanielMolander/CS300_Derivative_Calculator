@@ -9,39 +9,10 @@ import java.math.BigInteger;
  */
 public class AdditionNode extends Node{
 
-	//	private String display;
-	//	private ArrayList<AdditionNode> args;
-
+	
 	public AdditionNode(){
 		super("+");
 	}
-	//	
-	//	public void addChild(AdditionNode node){
-	//		if(node == null){
-	//			System.out.println("Warning!! improper equation detected");
-	//		}
-	//		if(args == null)
-	//			args = new ArrayList<AdditionNode>();
-	//		args.add(node);
-	//	}
-	//	
-	//	public int getNumChildren(){
-	//		if(args == null)
-	//			return 0;
-	//		return args.size();
-	//	}
-	//	
-	//	public String format(){
-	//		if(args == null)
-	//			return display;
-	//		String result = display;
-	//		for(AdditionNode n : args){
-	//			if(n!=null){
-	//				result+="("+n.format()+")";
-	//			}
-	//		}
-	//		return result;
-	//	}
 
 	//DONE
 	public Node Differentiate(String var) {
@@ -61,15 +32,23 @@ public class AdditionNode extends Node{
 			if(n instanceof ConstantNode){
 				ConstantNode temp = (ConstantNode)n;
 				sum=sum.add(new BigInteger(""+temp.num));
+			}else if(n instanceof AdditionNode){
+				Node temp = n.clone();
+				for(int i = 0; i < n.getNumChildren(); i++){
+					Node c = temp.getChild(0);
+					addNode.addChild(c.simplify());
+					temp.children.remove(0);
+				}
+//				System.out.println("addNode so far: "+addNode);
 			}else{
 				addNode.addChild(n.simplify());
 			}
 		}
-		if(!sum.equals(new BigInteger(""+0)) || addNode.getNumChildren() == 0){
+		if(!sum.equals(BigInteger.ZERO) || addNode.getNumChildren() == 0){
 			addNode.addChild(new ConstantNode(sum));
 		}
 		if(addNode.getNumChildren() == 1)
-			return addNode.getChild(0);
+			return addNode.getChild(0).clone();
 		return addNode;
 	}
 	

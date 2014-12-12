@@ -5,12 +5,14 @@ import tree.Node;
 
 
 public class Main {
-
+	
 	public static void main(String[] args){
-		
+		boolean showSteps = false;
+		if(args.length > 0 && args[0].equalsIgnoreCase("-show"))
+			showSteps = true;
 		Scanner sc = new Scanner(System.in);
 		System.out.println("Please enter equation to derivate (ex. \"x^2*y^2*z^12+abc\"):");
-		String eq = sc.nextLine();//"x^2*y^2*z^12+abc";
+		String eq = sc.nextLine();
 		String var = "";
 		while(var.length()!= 1){
 			System.out.println("Please enter single character for variable to differentiate in terms of (case sensitive, ex. \"x\"):");
@@ -29,6 +31,8 @@ public class Main {
 		while(!tree.equals(temp)){
 			temp = tree.clone();
 			tree = tree.simplify();
+			if(showSteps)
+				System.out.println("simplified:\n"+tree);
 		}
 		System.out.println("simplified:\n"+tree);
 	}
